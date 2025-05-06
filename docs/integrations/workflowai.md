@@ -105,6 +105,17 @@ The WorkflowAI chat completion endpoint allows you to run more than 100 models u
 To change the model to use, simply update the `model` string, ex: 
 
 ```python
+import os
+
+import instructor
+from openai import OpenAI
+from pydantic import BaseModel
+
+
+class UserInfo(BaseModel):
+    name: str
+    age: int
+
 def extract_user_info(user_message: str) -> UserInfo:
     client = instructor.from_openai(
         OpenAI(base_url=os.environ["WORKFLOWAI_API_URL"], api_key=os.environ["WORKFLOWAI_API_KEY"]),
@@ -116,6 +127,10 @@ def extract_user_info(user_message: str) -> UserInfo:
         response_model=UserInfo,
         messages=[{"role": "user", "content": user_message}],
     )
+
+if __name__ == "__main__":
+    user_info = extract_user_info("John Black is 33 years old.")
+    print("Basic example result:", user_info)  # UserInfo(name='John Black', age=33)
 ```
 
 In this case, the agent now runs on Claude 3.7 Sonnet.
@@ -146,10 +161,14 @@ You can run generation asynchronously, the same way as with the normal OpenAI im
 
 ```python
 import os
-
+import asyncio
 import instructor
 from openai import AsyncOpenAI
 from pydantic import BaseModel
+
+class UserInfo(BaseModel):
+    name: str
+    age: int
 
 async def extract_user_info_async(user_message: str) -> UserInfo:
     client = instructor.from_openai(
@@ -162,6 +181,10 @@ async def extract_user_info_async(user_message: str) -> UserInfo:
         response_model=UserInfo,
         messages=[{"role": "user", "content": user_message}],
     )
+    
+if __name__ == "__main__":
+    user_info = asyncio.run(extract_user_info_async("John Black is 33 years old."))
+    print("Basic example result:", user_info)  # UserInfo(name='John Black', age=33)
 ```
 
 ## Templating with Input Variables
